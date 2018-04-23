@@ -144,7 +144,8 @@ function resto_info(data){
                 $.each(business_data,function (ind,val) {
                     if (val.hasOwnProperty(resto)) {
                         bus_id = resto;
-                        html_str += '<h5 onclick="draw(\''+resto+'\')">'+val[resto].name+'</h5>';
+                        var bus_name = val[resto].name;
+                        html_str += '<a href="#radial_chart_div"><h5 onclick="draw(\''+resto+'\',\''+bus_name+'\')">'+val[resto].name+'</h5></a>';
                     }
                 });
 
@@ -160,7 +161,7 @@ function resto_info(data){
 }
 
 // Draw Radial Graph
-function draw(bus_id) {
+function draw(bus_id,bus_name) {
 
     var margin = 0,
         width = 600,
@@ -168,6 +169,8 @@ function draw(bus_id) {
         maxBarHeight = height / 2 - (margin + 70);
 
     var innerRadius = 0.1 * maxBarHeight; // innermost circle
+    $("#radial_chart_title").html(bus_name);
+
     $("#radial_chart").html("");
     var svg = d3.select('#radial_chart')
         .append("svg")
@@ -257,7 +260,7 @@ function draw(bus_id) {
 
     //d3.csv(csv, function(error, data) {
     //var bus_id = "-4TMQnQJW1yd6NqGRDvAeA";
-    var bus_name = ''
+    var bus_name = '';
     d3.json('data/categorized_checkins.json', function(error, data_new) {
         var ldab= [];
         console.log(error);
@@ -658,5 +661,3 @@ function clicked(d) {
         //this.setAttribute('class','states selected_state');
     }
 }
-
-
