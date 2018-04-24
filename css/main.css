@@ -419,3 +419,7 @@ textarea {
     font-size: 14px;
     fill: #fff;
 }
+
+.float_map{
+    float: right;
+}
