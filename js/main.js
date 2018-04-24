@@ -10,7 +10,8 @@ var path = d3.geo.path()
 .projection(projection);
 
 var svg = d3.select("#map").append("svg")
-.attr("width",width)
+    .attr("class","float_map")
+    .attr("width",width)
 .attr("height",height);
 
 svg.append("rect")
@@ -20,7 +21,7 @@ svg.append("rect")
 .on("click",clicked);
 
 var g = svg.append("g");
-
+var emotDoc = " ";
 
 var states_info = [];
 
@@ -121,7 +122,7 @@ function add_emoticon(cusine,pos,neg) {
     add_neg(cusine,neg);
 }
 function add_pos(id,pos) {
-    $("#cusine").append("<span style='font-size:18px'>"+id+"</span>");
+    $("#cusine").append("<span style='font-size:18px'>"+id+"</span><br>");
     for(var i=0;i<pos;i++){
         var emotDoc = d3.select("#cusine").append("img").attr("src","img/happy.jpg").attr("class","happy_img");
     }
@@ -132,27 +133,39 @@ function add_neg(id,neg) {
     }
 }
 
-
-
 function resto_info(data){
     d3.select('#rest_info').html('');
     html_str  = '';
+    var html_str_1 = '';
+    var html_str_inside = '';
     $.each(data.top_5_cuisines,function(ind,obj){
-        html_str += '<div class="col-md-4 col-sm-6 portfolio-item"><div class="portfolio-caption"><h4>'+obj.name+'</h4>';
+        html_str += '<div class="col-md-6 col-sm-6 portfolio-item"><div class="portfolio-caption card" style="display: grid;box-shadow: 2px 5px;color: #777;"><h4 class="card-header" style="background-color: #fed136;">'+obj.name+'</h4><div class="card-body">';
+        html_str_1 +='<div class="portfolio-item"><div class="portfolio-caption card" style="display: grid;box-shadow: 2px 5px;color: #777;"><h4 class="card-header" style="background-color: #fed136;">'+obj.name+'</h4><div class="card-body">';
+        var count = 0;
         $.each(obj.top_5_restaurants,function (ind,resto) {
             {
+                count +=1;
                 $.each(business_data,function (ind,val) {
                     if (val.hasOwnProperty(resto)) {
                         bus_id = resto;
                         var bus_name = val[resto].name;
-                        html_str += '<a href="#radial_chart_div"><h5 onclick="draw(\''+resto+'\',\''+bus_name+'\')">'+val[resto].name+'</h5></a>';
+                        html_str += '<a href="javascript:delay(\'#radial_chart_div\')"><h5 onclick="draw(\''+resto+'\',\''+bus_name+'\')">'+val[resto].name+'</h5></a>';
+                        html_str_inside = '<a href="javascript:delay(\'#radial_chart_div\')"><h5 onclick="draw(\''+resto+'\',\''+bus_name+'\')">'+val[resto].name+'</h5></a>';
+                        //html_str += "<a href=\"javascript:delay(\\'#radial_chart_div\\')\"><h5 onclick=\"draw(\\''+resto+'\\',\\''+bus_name+'\\')\">'+val[resto].name+'</h5></a>"
                     }
                 });
 
             }
-
         });
-        html_str +='</div></div>'
+        if (count ==1){
+            html_str =  html_str_1 + html_str_inside ;
+        }
+        if(count<5){
+            for(var i=0;i<5-count;i++){
+                html_str+='<a><h5></h5></a>'
+            }
+        }
+        html_str +='</div></div></div>'
     });
 
     const tableDiv = d3.select('#rest_info')
@@ -660,4 +673,9 @@ function clicked(d) {
 
         //this.setAttribute('class','states selected_state');
     }
+}
+
+
+function delay (URL) {
+    setTimeout( function() { window.location = URL }, 500 );
 }
