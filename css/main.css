@@ -309,7 +309,7 @@ textarea {
 }
 
 #states .selected_state {
-    fill: yellow;
+    fill: #fdd136;
 }
 
 #state-borders {

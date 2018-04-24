@@ -1,4 +1,4 @@
-var width = 960,
+var width = 900,
     height = 500,
     centered;
 var projection = d3.geo.albersUsa()
@@ -33,11 +33,11 @@ getinfo = function(id){
     return states_info[0].filter(function(z){return String(z.id) == id});
 };
 var business_data = [];
-d3.json('data/categorized_checkins.json', function (error,objs) {
+d3.json('data/categorized_checkins_with_attributes.json', function (error,objs) {
    business_data = objs;
 });
 var states_id = [];
-d3.json('data/state_cuisine.json',function (error,states){
+d3.json('data/state_data.json',function (error,states){
     $.each(states, function(ind,val){
         states_id.push(val.id);
     });
@@ -89,13 +89,13 @@ d3.json("data/us.json",function (error,us) {
                     })
             });
 
-  d3.json('data/state_cuisine.json',function (error,states) {
+  d3.json('data/state_data.json',function (error,states) {
   d3.selectAll('.state')
         .attr('xlink:href', function(d) {
             var img_url = '';
             $.each(states,function(state,state_data) {
                 if (getinfo(d.id)[0].state==state_data.name){
-                    img_url = 'img/'+state_data.type+'.svg';
+                    img_url = 'img/'+state_data.top_cuisine+'.svg';
                 }
             });
             return(img_url);
@@ -140,7 +140,7 @@ function resto_info(data){
     var html_str_inside = '';
     $.each(data.top_5_cuisines,function(ind,obj){
         html_str += '<div class="col-md-6 col-sm-6 portfolio-item"><div class="portfolio-caption card" style="display: grid;box-shadow: 2px 5px;color: #777;"><h4 class="card-header" style="background-color: #fed136;">'+obj.name+'</h4><div class="card-body">';
-        html_str_1 +='<div class="portfolio-item"><div class="portfolio-caption card" style="display: grid;box-shadow: 2px 5px;color: #777;"><h4 class="card-header" style="background-color: #fed136;">'+obj.name+'</h4><div class="card-body">';
+        //html_str_1 +='<div class="portfolio-item"><div class="portfolio-caption card" style="display: grid;box-shadow: 2px 5px;color: #777;"><h4 class="card-header" style="background-color: #fed136;">'+obj.name+'</h4><div class="card-body">';
         var count = 0;
         $.each(obj.top_5_restaurants,function (ind,resto) {
             {
@@ -150,16 +150,16 @@ function resto_info(data){
                         bus_id = resto;
                         var bus_name = val[resto].name;
                         html_str += '<a href="javascript:delay(\'#radial_chart_div\')"><h5 onclick="draw(\''+resto+'\',\''+bus_name+'\')">'+val[resto].name+'</h5></a>';
-                        html_str_inside = '<a href="javascript:delay(\'#radial_chart_div\')"><h5 onclick="draw(\''+resto+'\',\''+bus_name+'\')">'+val[resto].name+'</h5></a>';
+                        //html_str_1 += '<a href="javascript:delay(\'#radial_chart_div\')"><h5 onclick="draw(\''+resto+'\',\''+bus_name+'\')">'+val[resto].name+'</h5></a>';
                         //html_str += "<a href=\"javascript:delay(\\'#radial_chart_div\\')\"><h5 onclick=\"draw(\\''+resto+'\\',\\''+bus_name+'\\')\">'+val[resto].name+'</h5></a>"
                     }
                 });
 
             }
         });
-        if (count ==1){
-            html_str =  html_str_1 + html_str_inside ;
-        }
+        // if (count ==1){
+        //     html_str =  html_str_1  ;
+        // }
         if(count<5){
             for(var i=0;i<5-count;i++){
                 html_str+='<a><h5></h5></a>'
@@ -175,7 +175,7 @@ function resto_info(data){
 
 // Draw Radial Graph
 function draw(bus_id,bus_name) {
-
+    var attributes = {};
     var margin = 0,
         width = 600,
         height = 600,
@@ -274,7 +274,7 @@ function draw(bus_id,bus_name) {
     //d3.csv(csv, function(error, data) {
     //var bus_id = "-4TMQnQJW1yd6NqGRDvAeA";
     var bus_name = '';
-    d3.json('data/categorized_checkins.json', function(error, data_new) {
+    d3.json('data/categorized_checkins_with_attributes.json', function(error, data_new) {
         var ldab= [];
         console.log(error);
         $.each(data_new,function(ind,val){
@@ -286,8 +286,10 @@ function draw(bus_id,bus_name) {
                         ldab.push({'category_label':days,'question_label': time,'value':''+value});
                     });
                 });
+                attributes = val[bus_id].attributes;
             }
         });
+
         $("#resto_name").html(bus_name);
         var data = ldab;
 
@@ -563,6 +565,36 @@ function draw(bus_id,bus_name) {
                 return "rotate(" + (i * 360 / numCatBars) + ")";
             });
     });
+    d3.json('data/categorized_checkins_with_attributes.json', function(error, data_new) {
+        $.each(data_new, function (ind, val) {
+            if (val.hasOwnProperty(bus_id)) {
+                bus_name = val[bus_id].name;
+                attributes = val[bus_id].attributes;
+                $("#key_features").html('');
+                $("#key_features").html('Key Features');
+                $('#attrib_table').html('');
+                var table = d3.select("#attrib_table");
+
+                var tr_alcohol = table.append('tr');
+
+                tr_alcohol.append('td').append('h5').text('Alcohol:');
+                tr_alcohol.append('td').append('h5').text(attributes.Alcohol);
+                var BusinessParking = table.append('tr');
+                BusinessParking.append('td').append('h5').text('Business Parking:');
+                BusinessParking.append('td').append('h5').text(attributes.BusinessParking);
+                var GoodForMeal = table.append('tr');
+                GoodForMeal.append('td').append('h5').text('Good For Meal:');
+                GoodForMeal.append('td').append('h5').text(attributes.GoodForMeal);
+                var Music = table.append('tr');
+                Music.append('td').append('h5').text('Music:');
+                Music.append('td').append('h5').text(attributes.Music);
+                var WheelchairAccessible = table.append('tr');
+                WheelchairAccessible.append('td').append('h5').text('Wheel chair Accessible:');
+                WheelchairAccessible.append('td').append('h5').text(attributes.WheelchairAccessible);
+            }
+        });
+    });
+
 }
 function wrapTextOnArc(text, radius) {
     // note getComputedTextLength() doesn't work correctly for text on an arc,
