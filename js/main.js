@@ -116,21 +116,23 @@ d3.json("data/us.json",function (error,us) {
         .attr('y', -20);
 });
 
-function add_emoticon(cusine,pos,neg) {
+function add_emoticon(cusine,pos,neg,float_pos) {
     var d = d3.select("#cusine").append("div").attr('class','row custom_class');
-    add_pos(cusine,pos);
-    add_neg(cusine,neg);
+    add_pos(cusine,pos,float_pos);
+    add_neg(cusine,neg,float_pos);
 }
-function add_pos(id,pos) {
+function add_pos(id,pos,float_pos) {
     $("#cusine").append("<span style='font-size:18px'>"+id+"</span><br>");
     for(var i=0;i<pos;i++){
         var emotDoc = d3.select("#cusine").append("img").attr("src","img/happy.jpg").attr("class","happy_img");
     }
 }
-function add_neg(id,neg) {
+function add_neg(id,neg,float_pos) {
     for(var i=0;i<neg;i++){
         var emotDoc = d3.select("#cusine").append("img").attr("src","img/sad.jpg").attr("class","neg_class");
+
     }
+    d3.select("#cusine").append("text").text((' '+float_pos*10).substring(0,6)+'%');
 }
 
 function resto_info(data){
@@ -695,7 +697,7 @@ function clicked(d) {
                     $.each(val.top_5_cuisines, function (ind, cusine_data) {
                         console.log(cusine_data);
                         var pos = Math.floor(cusine_data.pos);
-                        add_emoticon(cusine_data.name, pos, 10 - pos);
+                        add_emoticon(cusine_data.name, pos, 10 - pos, cusine_data.pos);
                     });
                     resto_info(state_data);
                     //draw('categorized_checkins.json');
